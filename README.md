@@ -18,6 +18,7 @@ Working with harhicorp vault
 ## packages used:
 
 * hvac : `pip install hvac`
+* python-dotenv : `pip3 install python-dotenv`
 
 ## commands to verify:
 
