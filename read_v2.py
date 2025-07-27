@@ -1,8 +1,14 @@
+from dotenv import load_dotenv
+import os
 import hvac
 
+# Vault connection details
+VAULT_ADDR = os.getenv("VAULT_ADDR") # Replace with your Vault container's address
+VAULT_TOKEN = os.getenv("VAULT_TOKEN") # Replace with your Vault token (e.g., root token or an authenticated token)
+
 client = hvac.Client(
-    url='http://127.0.0.1:8200',
-    token="hvs.N8FWxa08WjuGXHmGspkW9Dt0"
+    url=VAULT_ADDR,
+    token=VAULT_TOKEN
 )
 
 if client.is_authenticated():

@@ -1,8 +1,10 @@
+from dotenv import load_dotenv
+import os
 import hvac
 
-# Vault configuration
-VAULT_ADDR = 'http://127.0.0.1:8200'
-VAULT_TOKEN = 'hvs.N8FWxa08WjuGXHmGspkW9Dt0'  # replace with your token
+# Vault connection details
+VAULT_ADDR = os.getenv("VAULT_ADDR") # Replace with your Vault container's address
+VAULT_TOKEN = os.getenv("VAULT_TOKEN") # Replace with your Vault token (e.g., root token or an authenticated token)
 MOUNT_POINT = 'my'  # KV v2 mount
 SECRET_PATH = 'path'  # Relative path within the KV mount
 
