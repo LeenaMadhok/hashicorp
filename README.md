@@ -49,9 +49,51 @@ the unseat key will be used as vault_addr and root token as vault_token in our c
 
 run the following commands to set the VAULT_ADDR and VAULT_TOKEN:
 
-`export VAULT_ADDR='<port address>`
+`export VAULT_ADDR='<port address>'`
 
-`export VAULT_TOKEN='<root token>`
+`export VAULT_TOKEN='<root token>'`
 
 to check the status of the value: `vault status`
 
+vault cli read/write/delete commands:
+* `vault kv put <path> key_1=value_1`
+* `vault kv get <path>`
+* `vault kv delete <path>`
+
+here;
+* vault -> standard syntax
+* kv -> type of secret stored: key/value
+* put/get/delete -> methods
+* path -> path to store ur secret inside the vault like: my/path
+
+whenever the path is defined , we have to enable it inside the vault (enable secret engine). For that the following commands is executed:
+
+`vault secrets enable -path=<path> kv`
+
+![alt text](<Screenshot 2025-07-27 at 1.10.29 PM.png>)
+![alt text](<Screenshot 2025-07-27 at 1.24.52 PM.png>)
+
+to disable the vault path : `vault secrets disable <path>`
+
+![alt text](<Screenshot 2025-07-27 at 2.30.27 PM.png>)
+![alt text](<Screenshot 2025-07-27 at 2.40.27 PM.png>)
+
+read/write/delete cli operation:
+
+![alt text](<Screenshot 2025-07-27 at 1.15.48 PM.png>)
+
+to get the store secrets in json format : `vault kv get -format-json <path>`
+
+![alt text](<Screenshot 2025-07-27 at 1.17.39 PM.png>)
+
+to check all the secret path present in your vault: `vault secrets list`
+
+![alt text](<Screenshot 2025-07-27 at 1.25.35 PM.png>)
+
+here:
+'my/' is a custom path while others are default path of the vault.
+
+
+## reference links:
+* https://hub.docker.com/r/hashicorp/vault
+* https://developer.hashicorp.com/vault/install
