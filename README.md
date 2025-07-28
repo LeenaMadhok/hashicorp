@@ -97,3 +97,38 @@ here:
 ## reference links:
 * https://hub.docker.com/r/hashicorp/vault
 * https://developer.hashicorp.com/vault/install
+* restAPI from CLI: https://developer.hashicorp.com/vault/api-docs
+
+
+
+
+## hashicorp in prod mode
+* unset token : `unset VAULT_TOKEN`
+* set up hashicorp config.hcp file:
+```
+storage "raft" {
+  path    = "./vault/data"
+  node_id = "node1"
+}
+
+listener "tcp" {
+  address     = "127.0.0.1:8200"
+  tls_disable = "true"
+}
+
+api_addr = "http://127.0.0.1:8200"
+cluster_addr = "https://127.0.0.1:8201"
+ui = true
+```
+
+
+
+* Create "RAFT" storage backend directory : `mkdir -p ./vault/data`
+
+* Starting vault server using config.hcl : `vault server -config=config.hcl`
+
+* Export VAULT_ADDR : `export VAULT_ADDR='http://127.0.0.1:8200'`
+
+* Initialize vault : `vault operator init`
+
+* Unseal vault : `vault operator unseal`
