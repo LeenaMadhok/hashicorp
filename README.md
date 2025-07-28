@@ -132,3 +132,6 @@ ui = true
 * Initialize vault : `vault operator init`
 
 * Unseal vault : `vault operator unseal`
+
+
+#### UI link will look like this : `http://localhost:8200/ui/vault/dashboard`
