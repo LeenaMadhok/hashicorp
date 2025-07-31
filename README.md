@@ -97,3 +97,132 @@ here:
 ## reference links:
 * https://hub.docker.com/r/hashicorp/vault
 * https://developer.hashicorp.com/vault/install
+* restAPI from CLI: https://developer.hashicorp.com/vault/api-docs
+
+
+
+
+## hashicorp in prod mode
+* unset token : `unset VAULT_TOKEN`
+* set up hashicorp config.hcp file:
+```
+storage "raft" {
+  path    = "./vault/data"
+  node_id = "node1"
+}
+
+listener "tcp" {
+  address     = "127.0.0.1:8200"
+  tls_disable = "true"
+}
+
+api_addr = "http://127.0.0.1:8200"
+cluster_addr = "https://127.0.0.1:8201"
+ui = true
+```
+
+
+
+* Create "RAFT" storage backend directory : `mkdir -p ./vault/data`
+
+* Starting vault server using config.hcl : `vault server -config=config.hcl`
+
+* Export VAULT_ADDR : `export VAULT_ADDR='http://127.0.0.1:8200'`
+
+* Initialize vault : `vault operator init`
+
+* Unseal vault : `vault operator unseal`
+
+
+#### UI link will look like this : `http://localhost:8200/ui/vault/dashboard`
+
+
+## roles and policies in hashicorp vault:
+* https://developer.hashicorp.com/vault/tutorials/get-started/introduction-roles
+* https://developer.hashicorp.com/vault/docs/concepts/policies
+
+
+## defining roles in hashicorp:
+example of a aws path with type as aws
+
+* Enable the secret engine path for AWS : `vault secrets enable -path=aws aws`
+
+* View the secret list: `vault secrets list`
+
+* Write AWS root config inside your hashicorp vault
+
+```
+vault write aws/config/root \
+access_key=YOUR_ACCESS_KEY \
+secret_key=YOUR_SECRET_KEY \
+region=eu-north-1
+```
+
+* Setup role 
+
+```
+vault write aws/roles/my-ec2-role \
+        credential_type=iam_user \
+        policy_document=-EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "Stmt1426528957000",
+      "Effect": "Allow",
+      "Action": [
+        "ec2:*"
+      ],
+      "Resource": [
+        "*"
+      ]
+    }
+  ]
+}
+EOF
+```
+
+* Generate access key and secret key for that role: `vault read aws/creds/my-ec2-role`
+
+*  Revoke the secrets if you do not want it any longer: `vault lease revoke <lease_id>`
+
+## policy in hashicory:
+
+* List vault policies : `vault policy list`
+
+* Write your custom policy : `vault policy write my-policy -  EOF`
+
+```
+# Dev servers have version 2 of KV secrets engine mounted by default, so will
+# need these paths to grant permissions:
+path "secret/data/*" {
+  capabilities = ["create", "update"]
+}
+
+path "secret/data/foo" {
+  capabilities = ["read"]
+}
+EOF
+```
+
+* Read Vault policy details : `vault policy read my-policy`
+
+* Delete Vault policy by policy name : `vault policy delete my-policy`
+
+* Attach token to policy : `export VAULT_TOKEN="$(vault token create -field token -policy=my-policy)"`
+
+* Associate auth method with policy 
+
+```
+vault write auth/approle/role/my-role \
+    secret_id_ttl=10m \
+    token_num_uses=10 \
+    token_ttl=20m \
+    token_max_ttl=30m \
+    secret_id_num_uses=40 \
+    token_policies=my-policy
+```
+
+* Generate and Export Role ID: `export ROLE_ID="$(vault read -field=role_id auth/approle/role/my-role/role-id)"`
+
+* Generate and Export Secret ID: `export SECRET_ID="$(vault write -f -field=secret_id auth/approle/role/my-role/secret-id)"`
